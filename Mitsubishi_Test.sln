@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitsubishi_Test", "Mitsubishi_Test\Mitsubishi_Test.csproj", "{191E7D0A-BA44-419E-A405-DE8A3D38FAC9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{191E7D0A-BA44-419E-A405-DE8A3D38FAC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{191E7D0A-BA44-419E-A405-DE8A3D38FAC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{191E7D0A-BA44-419E-A405-DE8A3D38FAC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{191E7D0A-BA44-419E-A405-DE8A3D38FAC9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D5E16393-44BF-4ACC-A1A6-00AA957F87E6}
+	EndGlobalSection
+EndGlobal
