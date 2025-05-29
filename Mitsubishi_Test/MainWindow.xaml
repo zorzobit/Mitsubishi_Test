@@ -249,6 +249,195 @@
                 </StackPanel>
             </Grid>
         </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="12"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" BorderBrush="Maroon" BorderThickness="1">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="num"/>
+                            <Button Content="{Binding SetNumButtonName}" Command="{Binding SetNumValues}" Margin="5,1" Width="50"/>
+                        </StackPanel>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Margin="2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RDnum1.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetNumNamesEnabled}"/>
+                                <TextBox Grid.Column="1" Text="{Binding RDnum1.Value, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetNumValuesEnabled}" Background="LightGray" Margin="-1,0,0,0"/>
+                            </Grid>
+                            <Grid Grid.Row="1" Margin="2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RDnum2.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetNumNamesEnabled}"/>
+                                <TextBox Grid.Column="1" Text="{Binding RDnum2.Value, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetNumValuesEnabled}" Background="LightGray" Margin="-1,0,0,0"/>
+                            </Grid>
+                            <Grid Grid.Row="2" Margin="2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RDnum3.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetNumNamesEnabled}"/>
+                                <TextBox Grid.Column="1" Text="{Binding RDnum3.Value, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetNumValuesEnabled}" Background="LightGray" Margin="-1,0,0,0"/>
+                            </Grid>
+                            <Grid Grid.Row="3" Margin="2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RDnum4.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetNumNamesEnabled}"/>
+                                <TextBox Grid.Column="1" Text="{Binding RDnum4.Value, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetNumValuesEnabled}" Background="LightGray" Margin="-1,0,0,0"/>
+                            </Grid>
+                            <Grid Grid.Row="4" Margin="2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RDnum5.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetNumNamesEnabled}"/>
+                                <TextBox Grid.Column="1" Text="{Binding RDnum5.Value, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetNumValuesEnabled}" Background="LightGray" Margin="-1,0,0,0"/>
+                            </Grid>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" BorderBrush="Maroon" BorderThickness="1" Margin="-1,0,0,0">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Pos Reg"/>
+                            <Button Content="{Binding SetPosRegButtonName}" Command="{Binding SetPosRegValues}" Margin="5,1" Width="50"/>
+                        </StackPanel>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Margin="2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RDposReg1.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetPosRegNamesEnabled}"/>
+                                <TextBox Grid.Column="1" Text="{Binding RDposReg1.Value, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetPosRegValuesEnabled}" Background="LightGray" Margin="-1,0,0,0"/>
+                            </Grid>
+                            <Grid Grid.Row="1" Margin="2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RDposReg2.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetPosRegNamesEnabled}"/>
+                                <TextBox Grid.Column="1" Text="{Binding RDposReg2.Value, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetPosRegValuesEnabled}" Background="LightGray" Margin="-1,0,0,0"/>
+                            </Grid>
+                            <Grid Grid.Row="2" Margin="2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RDposReg3.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetPosRegNamesEnabled}"/>
+                                <TextBox Grid.Column="1" Text="{Binding RDposReg3.Value, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetPosRegValuesEnabled}" Background="LightGray" Margin="-1,0,0,0"/>
+                            </Grid>
+                            <Grid Grid.Row="3" Margin="2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RDposReg4.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetPosRegNamesEnabled}"/>
+                                <TextBox Grid.Column="1" Text="{Binding RDposReg4.Value, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetPosRegValuesEnabled}" Background="LightGray" Margin="-1,0,0,0"/>
+                            </Grid>
+                            <Grid Grid.Row="4" Margin="2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RDposReg5.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetPosRegNamesEnabled}"/>
+                                <TextBox Grid.Column="1" Text="{Binding RDposReg5.Value, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetPosRegValuesEnabled}" Background="LightGray" Margin="-1,0,0,0"/>
+                            </Grid>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" BorderBrush="Maroon" BorderThickness="1" Margin="-1,0,0,0">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="IOSignal"/>
+                            <Button Content="{Binding SetIOButtonName}" Command="{Binding SetIOValues}" Margin="5,1" Width="50"/>
+                        </StackPanel>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Margin="2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RDIO1.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetIONamesEnabled}"/>
+                                <ToggleButton Grid.Column="1" Style="{StaticResource HorizontalSwitchStyle}" Margin="0" IsChecked="{Binding RDIO1.IsON}" IsEnabled="{Binding SetIOValuesEnabled}"/>
+                            </Grid>
+                            <Grid Grid.Row="1" Margin="2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RDIO2.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetIONamesEnabled}"/>
+                                <ToggleButton Grid.Column="1" Style="{StaticResource HorizontalSwitchStyle}" Margin="0" IsChecked="{Binding RDIO2.IsON}" IsEnabled="{Binding SetIOValuesEnabled}"/>
+                            </Grid>
+                            <Grid Grid.Row="2" Margin="2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RDIO3.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetIONamesEnabled}"/>
+                                <ToggleButton Grid.Column="1" Style="{StaticResource HorizontalSwitchStyle}" Margin="0" IsChecked="{Binding RDIO3.IsON}" IsEnabled="{Binding SetIOValuesEnabled}"/>
+                            </Grid>
+                            <Grid Grid.Row="3" Margin="2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RDIO4.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SetIONamesEnabled}"/>
+                                <ToggleButton Grid.Column="1" Style="{StaticResource HorizontalSwitchStyle}" Margin="0" IsChecked="{Binding RDIO4.IsON}" IsEnabled="{Binding SetIOValuesEnabled}"/>
+                            </Grid>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1">
+                <h:HelixViewport3D x:Name="viewPort3d"  ShowFrameRate="False" ZoomExtentsWhenLoaded="True" 
+              ZoomAroundMouseDownPoint="True" RotateAroundMouseDownPoint="True" 
+              IsTopBottomViewOrientedToFrontBack="True" IsManipulationEnabled="False"
+              IsViewCubeEdgeClicksEnabled="True">
+                    <h:DefaultLights>
 
+                    </h:DefaultLights>
+                    <h:HelixViewport3D.Background>
+                        <SolidColorBrush Color="ForestGreen"/>
+                    </h:HelixViewport3D.Background>
+                </h:HelixViewport3D>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

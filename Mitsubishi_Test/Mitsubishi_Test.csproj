@@ -19,7 +19,6 @@
     <PackageReference Include="MaterialDesignThemes" Version="5.2.1" />
     <PackageReference Include="MaterialDesignThemes.MahApps" Version="5.2.1" />
     <PackageReference Include="MaterialDesignThemes.Wpf" Version="1.0.1" />
-    <PackageReference Include="Melfa.Robot" Version="0.1.22.5" />
     <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
   </ItemGroup>
 
