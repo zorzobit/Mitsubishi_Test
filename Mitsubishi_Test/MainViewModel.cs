@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Intrinsics.Arm;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
@@ -60,26 +61,70 @@ namespace Mitsubishi_Test
         {
             if (robot.IsConnected)
             {
-                PositionJ = robot.CurrentPositionJ;
-                PositionP = robot.CurrentPositionP;
-                State state = robot.GetState();
-                OperationStatus = state.RunStatus.ToString();
-                ActiveTask = "Program: " + state.ProgramName;
-                Modules = "Priority: " + state.TaskPriority.ToString();
-                ProgramPosition = "Line: " + state.LineNumber.ToString();
                 try
                 {
-                    PositionP p1 = robot.ProgramGetPosition("P_01");
-                    var post = robot.CurrentPositionP;
-
-                    var sfs = post.ToString();
-                    robot.WriteVariable("", "P_01", sfs);
-                    PositionP p2 = robot.ProgramGetPosition("P_01");
+                    PositionJ = robot.CurrentPositionJ;
+                    PositionP = robot.CurrentPositionP;
                 }
                 catch (Exception ex)
                 {
                     var msg = ex.Message;
                 }
+                try
+                {
+                    State state = robot.GetState();
+                    OperationStatus = state.RunStatus.ToString();
+                    ActiveTask = "Program: " + state.ProgramName;
+                    Modules = "Priority: " + state.TaskPriority.ToString();
+                    ProgramPosition = "Line: " + state.LineNumber.ToString();
+                }
+                catch (Exception ex)
+                {
+                    var msg = ex.Message;
+                }
+                try
+                {
+                    //PositionP p1 = robot.ProgramGetPosition("P_01");
+                    //p1.X -= 0.01;
+                    //robot.WriteVariable("", "P_01", p1.ToString());
+                    //PositionP p2 = robot.ProgramGetPosition("P_01");
+                }
+                catch (Exception ex)
+                {
+                    var msg = ex.Message;
+                }
+                try
+                {
+                    if (SetNumValuesEnabled)
+                    {
+                        robot.WriteNumData(RDnum1);
+                        robot.WriteNumData(RDnum2);
+                        robot.WriteNumData(RDnum3);
+                        robot.WriteNumData(RDnum4);
+                        robot.WriteNumData(RDnum5);
+                    }
+                    else
+                    {
+                        robot.ReadNumData(RDnum1);
+                        robot.ReadNumData(RDnum2);
+                        robot.ReadNumData(RDnum3);
+                        robot.ReadNumData(RDnum4);
+                        robot.ReadNumData(RDnum5);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var msg = ex.Message;
+                }
+                try
+                {
+
+                }
+                catch (Exception ex)
+                {
+                    var msg = ex.Message;
+                }
+                    
                 if (!overrideHold)
                 {
                     Override = robot.Override;
@@ -93,7 +138,7 @@ namespace Mitsubishi_Test
         public string ActiveTask { get; set; }
         public string Modules { get; set; }
         public string ProgramPosition { get; set; }
-        public string IP { get; set; } = "192.168.0.118";
+        public string IP { get; set; } = "127.0.0.1";
 
         public bool SetNumValuesEnabled { get; set; } = false;
         public bool SetNumNamesEnabled { get; set; } = true;
@@ -379,24 +424,13 @@ namespace Mitsubishi_Test
         public byte Flag2 { get; set; }
         public string Identifier { get; set; }
 
-        private const string PositionXyzPattern =
-            @"^\s*\(" +
-            @"\s*(?'X'[+-]?\d+(?:\.\d+)?|[nN][aA][nN]|[+-]?[iI][nN][fF])\s*," +
-            @"\s*(?'Y'[+-]?\d+(?:\.\d+)?|[nN][aA][nN]|[+-]?[iI][nN][fF])\s*," +
-            @"\s*(?'Z'[+-]?\d+(?:\.\.\d+)?|[nN][aA][nN]|[+-]?[iI][nN][fF])\s*," +
-            @"\s*(?'A'[+-]?\d+(?:\.\d+)?|[nN][aA][nN]|[+-]?[iI][nN][fF])\s*," +
-            @"\s*(?'B'[+-]?\d+(?:\.\d+)?|[nN][aA][nN]|[+-]?[iI][nN][fF])\s*," +
-            @"\s*(?'C'[+-]?\d+(?:\.\d+)?|[nN][aA][nN]|[+-]?[iI][nN][fF])\s*," +
-            @"\s*(?'L1'[+-]?\d+(?:\.\d+)?|[nN][aA][nN]|[+-]?[iI][nN][fF])\s*," +
-            @"\s*(?'L2'[+-]?\d+(?:\.\d+)?|[nN][aA][nN]|[+-]?[iI][nN][fF])\s*" +
-            @"\)\s*\(" +
-            @"\s*(?'FLG1'0[xX][0-9a-fA-F]+|\d+|[lLrR][bBaA][fFnN])\s*," +
-            @"\s*(?'FLG2'0[xX][0-9a-fA-F]+|\d+)\s*" +
-            @"\)\s*$";
+        private const string PositionXyzPattern = @"^\((?<X>[+-]?\d+\.\d+),(?<Y>[+-]?\d+\.\d+),(?<Z>[+-]?\d+\.\d+),(?<A>[+-]?\d+\.\d+),(?<B>[+-]?\d+\.\d+),(?<C>[+-]?\d+\.\d+),(?<L1>[+-]?\d+\.\d+),(?<L2>[+-]?\d+\.\d+)\)\((?<Flag1>\d+),(?<Flag2>\d+)\)$";
 
+        //private const string SemicolonPattern = @"(?'POS'((X|Y|Z|A|B|C|L1|L2);-?\d+\.?\d+;){6,8});?(?'FLG1'\d+),(?'FLG2'\d+);(?'OVRD'\d+);(?'ENDSPEED'-?\d+.\d+);(?'LIMIT'[0-9a-fA-F]{8})";
         private const string SemicolonPattern =
-            @"(?i)^Qok(?<id>[^\;]*)\;X;(?<X>-?\d+\.?\d*)\;Y;(?<Y>-?\d+\.?\d*)\;Z;(?<Z>-?\d+\.?\d*)\;" +
-            @"A;(?<A>-?\d+\.?\d*)\;B;(?<B>-?\d+\.?\d*)\;C;(?<C>-?\d+\.?\d*)\;\;(?<FLG1>\d+),(?<FLG2>\d+);";
+    @"X;(?<X>[+-]?\d+\.\d+);Y;(?<Y>[+-]?\d+\.\d+);Z;(?<Z>[+-]?\d+\.\d+);A;(?<A>[+-]?\d+\.\d+);B;(?<B>[+-]?\d+\.\d+);C;(?<C>[+-]?\d+\.\d+);;(?<Flag1>\d+),(?<Flag2>\d+);(?<Ignored1>\d+);(?<Ignored2>[+-]?\d+\.\d+);(?<Identifier>\d+)";
+
+
 
         public PositionP(string input)
         {
@@ -405,14 +439,13 @@ namespace Mitsubishi_Test
 
             input = input.Trim();
 
-            if (!input.StartsWith("Qok", StringComparison.OrdinalIgnoreCase))
-                throw new FormatException("Input must start with 'Qok'.");
+            // Save identifier if present
+            if (input.StartsWith("Qok", StringComparison.OrdinalIgnoreCase))
+            {
+                input = input.Substring(3);
+            }
 
-            // Extract identifier like QokX, QokP_01, etc.
-            int prefixEnd = input.IndexOf('=') != -1 ? input.IndexOf('=') : input.IndexOf(';');
-            Identifier = input.Substring(0, prefixEnd).Trim();
-
-            // Try semicolon format
+            // Try semicolon format starting from "X;"
             var semicolonMatch = Regex.Match(input, SemicolonPattern);
             if (semicolonMatch.Success)
             {
@@ -422,9 +455,10 @@ namespace Mitsubishi_Test
                 A = double.Parse(semicolonMatch.Groups["A"].Value, CultureInfo.InvariantCulture);
                 B = double.Parse(semicolonMatch.Groups["B"].Value, CultureInfo.InvariantCulture);
                 C = double.Parse(semicolonMatch.Groups["C"].Value, CultureInfo.InvariantCulture);
-                L1 = 0; L2 = 0; // Not present in this format
-                Flag1 = byte.Parse(semicolonMatch.Groups["FLG1"].Value, CultureInfo.InvariantCulture);
-                Flag2 = byte.Parse(semicolonMatch.Groups["FLG2"].Value, CultureInfo.InvariantCulture);
+                L1 = 0;
+                L2 = 0;
+                Flag1 = byte.Parse(semicolonMatch.Groups["Flag1"].Value, CultureInfo.InvariantCulture);
+                Flag2 = byte.Parse(semicolonMatch.Groups["Flag2"].Value, CultureInfo.InvariantCulture);
                 return;
             }
 
@@ -445,13 +479,28 @@ namespace Mitsubishi_Test
                 C = double.Parse(match.Groups["C"].Value, CultureInfo.InvariantCulture);
                 L1 = double.Parse(match.Groups["L1"].Value, CultureInfo.InvariantCulture);
                 L2 = double.Parse(match.Groups["L2"].Value, CultureInfo.InvariantCulture);
-                Flag1 = byte.Parse(match.Groups["FLG1"].Value, CultureInfo.InvariantCulture);
-                Flag2 = byte.Parse(match.Groups["FLG2"].Value, CultureInfo.InvariantCulture);
+                Flag1 = byte.Parse(match.Groups["Flag1"].Value, CultureInfo.InvariantCulture);
+                Flag2 = byte.Parse(match.Groups["Flag2"].Value, CultureInfo.InvariantCulture);
                 return;
             }
 
-            throw new FormatException("Unrecognized PositionP format.");
+            return;
         }
+
+        /// <summary>
+        /// Returns a string representation of the DataParser object in the format:
+        /// (+X,Y,Z,A,B,C,L1,L2)(Flag1,Flag2)
+        /// </summary>
+        public override string ToString()
+        {
+            // Format doubles to two decimal places, always showing a sign for non-negative values.
+            // The "F2" format specifier formats to two decimal places.
+            // The "+" custom format specifier ensures a plus sign for positive numbers.
+            return string.Format(CultureInfo.InvariantCulture,
+                "({0:+0.00;-0.00;+0.00},{1:+0.00;-0.00;+0.00},{2:+0.00;-0.00;+0.00},{3:+0.00;-0.00;+0.00},{4:+0.00;-0.00;+0.00},{5:+0.00;-0.00;+0.00},{6:+0.00;-0.00;+0.00},{7:+0.00;-0.00;+0.00})({8},{9})",
+                X, Y, Z, A, B, C, L1, L2, Flag1, Flag2);
+        }
+
     }
     public class State
     {
@@ -637,6 +686,45 @@ namespace Mitsubishi_Test
         internal void ResetAlarm()
         {
             string result = SendCommand("1;1;RSTALRM");
+        }
+
+        internal void WriteNumData(RDItem rdi)
+        {
+            double val = 0.0;
+            double val2 = 0.0;
+            string result = SendCommand($"1;1;LISTPR_" + rdi.Name);
+            if (result.StartsWith("Qok", StringComparison.OrdinalIgnoreCase) && result.Contains("="))
+                result = result.Substring(3).Split('=')[1];
+            else
+                return;
+            double.TryParse(rdi.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out val);
+            double.TryParse(result, NumberStyles.Float, CultureInfo.InvariantCulture, out val2);
+            if (val != val2)
+            {
+                string result2 = SendCommand($"1;1;HOT;R_{rdi.Name}={rdi.Value}"); 
+            }
+        }
+
+        internal void ReadNumData(RDItem rdi)
+        {
+            if (string.IsNullOrEmpty(rdi.Name)) return;
+            try
+            {
+                string result = SendCommand($"1;1;LISTPR_" + rdi.Name);
+                if (result.StartsWith("Qok", StringComparison.OrdinalIgnoreCase) && result.Contains("="))
+                    result = result.Substring(3).Split('=')[1];
+                else
+                    return;
+                double val = 0;
+                if (double.TryParse(result, NumberStyles.Any, CultureInfo.InvariantCulture, out val))
+                {
+                    double roundedVal = Math.Round(val, 3, MidpointRounding.AwayFromZero);
+                    rdi.Value = roundedVal.ToString(CultureInfo.InvariantCulture);
+                }
+            }
+            catch (Exception)
+            {
+            }
         }
     }
     [Flags]
