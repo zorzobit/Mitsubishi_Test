@@ -1,8 +1,10 @@
 ﻿using PropertyChanged;
+using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime.Intrinsics.Arm;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -111,6 +113,36 @@ namespace Mitsubishi_Test
                         robot.ReadNumData(RDnum4);
                         robot.ReadNumData(RDnum5);
                     }
+                    if (SetPosRegValuesEnabled)
+                    {
+                        robot.WritePosData(RDposReg1);
+                        robot.WritePosData(RDposReg2);
+                        robot.WritePosData(RDposReg3);
+                        robot.WritePosData(RDposReg4);
+                        robot.WritePosData(RDposReg5);
+                    }
+                    else
+                    {
+                        robot.ReadPosData(RDposReg1);
+                        robot.ReadPosData(RDposReg2);
+                        robot.ReadPosData(RDposReg3);
+                        robot.ReadPosData(RDposReg4);
+                        robot.ReadPosData(RDposReg5);
+                    }
+                    if (SetIOValuesEnabled)
+                    {
+                        robot.WriteIOData(RDIO1);
+                        robot.WriteIOData(RDIO2);
+                        robot.WriteIOData(RDIO3);
+                        robot.WriteIOData(RDIO4);
+                    }
+                    else
+                    {
+                        robot.ReadIOData(RDIO1);
+                        robot.ReadIOData(RDIO2);
+                        robot.ReadIOData(RDIO3);
+                        robot.ReadIOData(RDIO4);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -160,7 +192,7 @@ namespace Mitsubishi_Test
         public RDItem RDposReg2 { get; set; }
         public RDItem RDposReg3 { get; set; }
         public RDItem RDposReg4 { get; set; }
-        public RDItem RDposReg5{ get; set; }
+        public RDItem RDposReg5 { get; set; }
 
         public RDItem RDIO1 { get; set; }
         public RDItem RDIO2 { get; set; }
@@ -424,13 +456,10 @@ namespace Mitsubishi_Test
         public byte Flag2 { get; set; }
         public string Identifier { get; set; }
 
-        private const string PositionXyzPattern = @"^\((?<X>[+-]?\d+\.\d+),(?<Y>[+-]?\d+\.\d+),(?<Z>[+-]?\d+\.\d+),(?<A>[+-]?\d+\.\d+),(?<B>[+-]?\d+\.\d+),(?<C>[+-]?\d+\.\d+),(?<L1>[+-]?\d+\.\d+),(?<L2>[+-]?\d+\.\d+)\)\((?<Flag1>\d+),(?<Flag2>\d+)\)$";
+        private const string PositionXyzPattern = @"^\((?<X>[+-]?\d+\.\d+),(?<Y>[+-]?\d+\.\d+),(?<Z>[+-]?\d+\.\d+),(?<A>[+-]?\d+\.\d+),(?<B>[+-]?\d+\.\d+),(?<C>[+-]?\d+\.\d+),(?<L1>[+-]?\d+\.\d+),(?<L2>[+-]?\d+\.\d+)\)\((?<Flag1>\d*),(?<Flag2>\d*)\)$"; // Modified here
 
-        //private const string SemicolonPattern = @"(?'POS'((X|Y|Z|A|B|C|L1|L2);-?\d+\.?\d+;){6,8});?(?'FLG1'\d+),(?'FLG2'\d+);(?'OVRD'\d+);(?'ENDSPEED'-?\d+.\d+);(?'LIMIT'[0-9a-fA-F]{8})";
         private const string SemicolonPattern =
     @"X;(?<X>[+-]?\d+\.\d+);Y;(?<Y>[+-]?\d+\.\d+);Z;(?<Z>[+-]?\d+\.\d+);A;(?<A>[+-]?\d+\.\d+);B;(?<B>[+-]?\d+\.\d+);C;(?<C>[+-]?\d+\.\d+);;(?<Flag1>\d+),(?<Flag2>\d+);(?<Ignored1>\d+);(?<Ignored2>[+-]?\d+\.\d+);(?<Identifier>\d+)";
-
-
 
         public PositionP(string input)
         {
@@ -439,11 +468,18 @@ namespace Mitsubishi_Test
 
             input = input.Trim();
 
-            // Save identifier if present
-            if (input.StartsWith("Qok", StringComparison.OrdinalIgnoreCase))
+            // Save identifier if present (this part of your original code is fine)
+            int eqIdx = input.IndexOf('=');
+            if (eqIdx >= 0 && input.StartsWith("QoK", StringComparison.OrdinalIgnoreCase)) // Refined check for Qok prefix
             {
-                input = input.Substring(3);
+                this.Identifier = input.Substring(0, eqIdx); // Capture "QoKP_200"
+                input = input.Substring(eqIdx + 1); // Get only the coordinate string
             }
+            else if (input.StartsWith("Qok", StringComparison.OrdinalIgnoreCase)) // Handle Qok without '='
+            {
+                input = input.Substring(3); // Remove just "Qok"
+            }
+            // If there's no "Qok" or '=', the identifier remains null/empty
 
             // Try semicolon format starting from "X;"
             var semicolonMatch = Regex.Match(input, SemicolonPattern);
@@ -455,34 +491,32 @@ namespace Mitsubishi_Test
                 A = double.Parse(semicolonMatch.Groups["A"].Value, CultureInfo.InvariantCulture);
                 B = double.Parse(semicolonMatch.Groups["B"].Value, CultureInfo.InvariantCulture);
                 C = double.Parse(semicolonMatch.Groups["C"].Value, CultureInfo.InvariantCulture);
-                L1 = 0;
+                L1 = 0; // L1 and L2 are not in this format
                 L2 = 0;
                 Flag1 = byte.Parse(semicolonMatch.Groups["Flag1"].Value, CultureInfo.InvariantCulture);
                 Flag2 = byte.Parse(semicolonMatch.Groups["Flag2"].Value, CultureInfo.InvariantCulture);
+                // Identifier is parsed within the semicolon pattern in your original code
+                // Identifier = semicolonMatch.Groups["Identifier"].Value; // If you want to use this Identifier
                 return;
             }
 
-            // Try parenthesis format: QokP_01=(...)(...)
-            int eqIdx = input.IndexOf('=');
-            if (eqIdx >= 0)
-            {
-                var rest = input.Substring(eqIdx + 1);
-                var match = Regex.Match(rest, PositionXyzPattern);
-                if (!match.Success)
-                    throw new FormatException("Invalid position format.");
+            // Try parenthesis format: (...)(...)
+            var match = Regex.Match(input, PositionXyzPattern);
+            if (!match.Success)
+                throw new FormatException("Invalid position format.");
 
-                X = double.Parse(match.Groups["X"].Value, CultureInfo.InvariantCulture);
-                Y = double.Parse(match.Groups["Y"].Value, CultureInfo.InvariantCulture);
-                Z = double.Parse(match.Groups["Z"].Value, CultureInfo.InvariantCulture);
-                A = double.Parse(match.Groups["A"].Value, CultureInfo.InvariantCulture);
-                B = double.Parse(match.Groups["B"].Value, CultureInfo.InvariantCulture);
-                C = double.Parse(match.Groups["C"].Value, CultureInfo.InvariantCulture);
-                L1 = double.Parse(match.Groups["L1"].Value, CultureInfo.InvariantCulture);
-                L2 = double.Parse(match.Groups["L2"].Value, CultureInfo.InvariantCulture);
-                Flag1 = byte.Parse(match.Groups["Flag1"].Value, CultureInfo.InvariantCulture);
-                Flag2 = byte.Parse(match.Groups["Flag2"].Value, CultureInfo.InvariantCulture);
-                return;
-            }
+            X = double.Parse(match.Groups["X"].Value, CultureInfo.InvariantCulture);
+            Y = double.Parse(match.Groups["Y"].Value, CultureInfo.InvariantCulture);
+            Z = double.Parse(match.Groups["Z"].Value, CultureInfo.InvariantCulture);
+            A = double.Parse(match.Groups["A"].Value, CultureInfo.InvariantCulture);
+            B = double.Parse(match.Groups["B"].Value, CultureInfo.InvariantCulture);
+            C = double.Parse(match.Groups["C"].Value, CultureInfo.InvariantCulture);
+            L1 = double.Parse(match.Groups["L1"].Value, CultureInfo.InvariantCulture);
+            L2 = double.Parse(match.Groups["L2"].Value, CultureInfo.InvariantCulture);
+
+            // Handle empty strings for flags
+            Flag1 = string.IsNullOrEmpty(match.Groups["Flag1"].Value) ? (byte)0 : byte.Parse(match.Groups["Flag1"].Value, CultureInfo.InvariantCulture);
+            Flag2 = string.IsNullOrEmpty(match.Groups["Flag2"].Value) ? (byte)0 : byte.Parse(match.Groups["Flag2"].Value, CultureInfo.InvariantCulture);
 
             return;
         }
@@ -493,14 +527,10 @@ namespace Mitsubishi_Test
         /// </summary>
         public override string ToString()
         {
-            // Format doubles to two decimal places, always showing a sign for non-negative values.
-            // The "F2" format specifier formats to two decimal places.
-            // The "+" custom format specifier ensures a plus sign for positive numbers.
             return string.Format(CultureInfo.InvariantCulture,
                 "({0:+0.00;-0.00;+0.00},{1:+0.00;-0.00;+0.00},{2:+0.00;-0.00;+0.00},{3:+0.00;-0.00;+0.00},{4:+0.00;-0.00;+0.00},{5:+0.00;-0.00;+0.00},{6:+0.00;-0.00;+0.00},{7:+0.00;-0.00;+0.00})({8},{9})",
                 X, Y, Z, A, B, C, L1, L2, Flag1, Flag2);
         }
-
     }
     public class State
     {
@@ -722,9 +752,175 @@ namespace Mitsubishi_Test
                     rdi.Value = roundedVal.ToString(CultureInfo.InvariantCulture);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                var msg = ex.Message;
             }
+        }
+
+        internal void WritePosData(RDItem rdi)
+        {
+            if (string.IsNullOrEmpty(rdi.Name)) return;
+            try
+            {
+                string result = SendCommand($"1;1;LISTPP_" + rdi.Name);
+                if (result.StartsWith("Qok", StringComparison.OrdinalIgnoreCase))
+                {
+                    PositionP posp = new PositionP(result);
+                    if (rdi.Value != posp.ToString())
+                    {
+                        PositionP posp2 = new PositionP(rdi.Value);
+                        string result2 = SendCommand($"1;1;HOT;P_{rdi.Name}={rdi.Value}");
+                    }
+                }
+                else
+                    return;
+            }
+            catch (Exception ex)
+            {
+                var msg = ex.Message;
+            }
+        }
+
+        internal void ReadPosData(RDItem rdi)
+        {
+            if (string.IsNullOrEmpty(rdi.Name)) return;
+            try
+            {
+                string result = SendCommand($"1;1;LISTPP_" + rdi.Name);
+                if (result.StartsWith("Qok", StringComparison.OrdinalIgnoreCase))
+                {
+                    PositionP posp = new PositionP(result);
+                    rdi.Value = posp.ToString();
+                }
+                else
+                    return;
+            }
+            catch (Exception ex)
+            {
+                var msg = ex.Message;
+            }
+        }
+
+        internal void WriteIOData(RDItem rdi)
+        {
+            if (string.IsNullOrEmpty(rdi.Name)) return;
+
+            try
+            {
+                int ioBitNumber;
+                if (!int.TryParse(rdi.Name, NumberStyles.Integer, CultureInfo.InvariantCulture, out ioBitNumber))
+                {
+                    throw new ArgumentException($"RDItem Name '{rdi.Name}' is not a valid integer I/O bit number.");
+                }
+
+                int wordIndex = ioBitNumber / 16;
+                int bitInWord = ioBitNumber % 16;
+                string readCommand = $"1;1;OUT" + (wordIndex * 16); // Query the starting bit of the word
+                string robotResponse = SendCommand(readCommand);
+
+                if (!robotResponse.StartsWith("Qok", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException($"Failed to read current output word {wordIndex}: {robotResponse}");
+                }
+
+                string hexValue = robotResponse.Substring(3);
+                if (!int.TryParse(hexValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int currentWordValue))
+                {
+                    throw new FormatException($"Could not parse hexadecimal word value '{hexValue}' from robot response.");
+                }
+                if (rdi.IsON != ((currentWordValue & (1 << bitInWord)) != 0))
+                {
+                    int newWordValue;
+                    if (rdi.IsON)
+                    {
+                        newWordValue = currentWordValue | (1 << bitInWord);
+                    }
+                    else
+                    {
+                        newWordValue = currentWordValue & ~(1 << bitInWord);
+                    }
+                    string writeCommand = $"1;1;OUT={wordIndex * 16};{newWordValue:X4}";
+                    string writeResult = SendCommand(writeCommand);
+
+                    if (!writeResult.StartsWith("Qok", StringComparison.OrdinalIgnoreCase) && !writeResult.StartsWith("OK", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new InvalidOperationException($"Failed to write output word {wordIndex} with value {newWordValue}: {writeResult}");
+                    }
+                }
+               
+            }
+            catch (Exception ex)
+            {
+                var msg = ex.Message;
+                Console.WriteLine($"Error writing IO data for {rdi.Name}: {msg}");
+            }
+        }
+
+        internal void ReadIOData(RDItem rdi)
+        {
+            if (string.IsNullOrEmpty(rdi.Name)) return;
+            try
+            {
+                int val = 0;
+                int.TryParse(rdi.Name, NumberStyles.Integer, CultureInfo.InvariantCulture, out val);
+                int wordIndex = val / 16;
+                int bitInWord = val % 16;
+                string result = SendCommand($"1;1;OUT" + wordIndex * 16);
+                if (result.StartsWith("Qok", StringComparison.OrdinalIgnoreCase))
+                    result = result.Substring(3);
+                else
+                    return;
+                if (!int.TryParse(result, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int wordValue))
+                {
+                    throw new ArgumentException($"Could not parse hexadecimal value: {result}");
+                }
+                rdi.IsON = (wordValue & (1 << bitInWord)) != 0;
+
+                //return isBitSet ? 1 : 0;
+            }
+            catch (Exception ex)
+            {
+                var msg = ex.Message;
+            }
+        }
+        public int GetOutputBitStatus(int ionum)
+        {
+            int wordIndex = ionum / 16;
+            int bitInWord = ionum % 16;
+            string robotResponse = SendCommand($"1;1;OUT{ionum}");
+            if (string.IsNullOrEmpty(robotResponse) || !robotResponse.StartsWith("Qok"))
+            {
+                throw new ArgumentException($"Invalid robot response: {robotResponse}");
+            }
+
+            string hexValue = robotResponse.Substring(3); // Remove "Qok"
+
+            if (!int.TryParse(hexValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int wordValue))
+            {
+                throw new ArgumentException($"Could not parse hexadecimal value: {hexValue}");
+            }
+            bool isBitSet = (wordValue & (1 << bitInWord)) != 0;
+
+            return isBitSet ? 1 : 0;
+        }
+        public bool ParseOutputBitStatus(string robotResponse, int ionum)
+        {
+            int bitInWord = ionum % 16;
+            if (string.IsNullOrEmpty(robotResponse) || !robotResponse.StartsWith("Qok"))
+            {
+                throw new ArgumentException($"Invalid robot response: {robotResponse}");
+            }
+
+            string hexValue = robotResponse.Substring(3); // Remove "Qok"
+
+            if (!int.TryParse(hexValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int wordValue))
+            {
+                throw new ArgumentException($"Could not parse hexadecimal value: {hexValue}");
+            }
+            bool isBitSet = (wordValue & (1 << bitInWord)) != 0;
+
+            return isBitSet;
         }
     }
     [Flags]
