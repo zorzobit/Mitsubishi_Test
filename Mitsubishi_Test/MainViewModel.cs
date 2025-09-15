@@ -162,7 +162,8 @@ namespace Mitsubishi_Test
         public string ActiveTask { get; set; }
         public string Modules { get; set; }
         public string ProgramPosition { get; set; }
-        public string IP { get; set; } = "127.0.0.1";
+        public string IP { get; set; } = "192.168.0.20";
+        //public string IP { get; set; } = "127.0.0.1";
 
         public bool SetNumValuesEnabled { get; set; } = false;
         public bool SetNumNamesEnabled { get; set; } = true;
