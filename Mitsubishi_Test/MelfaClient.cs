@@ -58,6 +58,7 @@ namespace Mitsubishi_Test
             {
                 _client = new TcpClient(ip, port);
                 _stream = _client.GetStream();
+                var open = SendCommand("1;1;OPEN=EMO");
                 IsConnected = true;
                 return true;
             }
